@@ -45,6 +45,15 @@ activities = new Collections.Activities();
 threads = new Collections.Threads();
 ```
 
+## Tests
+
+You must have node installed in order to run the tests.
+
+```
+npm install
+make
+```
+
 ## License
 
 (The MIT License)
