@@ -177,3 +177,4 @@ assert.deepEqual(tasks.pluck('id'), [4, 5]);
 assert.deepEqual(_.pluck(threads.models, 'cid'), ['c10', 'c9']);
 assert.deepEqual(_.pluck(tasks.models, 'cid'), ['c9', 'c10']);
 assert.equal(activities.length, 0);
+console.log('Green...');
