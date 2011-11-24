@@ -115,6 +115,35 @@
   };
 
   /**
+   * Remove a model from the aggregator collection
+   *
+   * @param {Object} collection
+   * @param {Object} options
+   * @return {Object} model
+   */
+  Aggregator._resetFromAggregator = function (collection, options) {
+    var type;
+
+    _.any(this.collections(), function (coll, index) {
+      var found = coll === collection;
+      if (found) {
+        type = index;
+      }
+      return found;
+    });
+
+    this.each(function (model) {
+      if (model.get('type') === type) {
+        this._removeFromAggregator(model, options);
+      }
+    }, this);
+
+    collection.each(function (model) {
+      this._addToAggregator(model, options);
+    }, this);
+  };
+
+  /**
    * Prepare a model to be added to a collection
    *
    * @param {Object} model
@@ -148,6 +177,10 @@
 
     if (ev === 'remove' && collection !== this) {
       this._removeFromAggregator(model, options);
+    }
+
+    if (ev === 'reset' && model !== this) {
+      this._resetFromAggregator(model, collection);
     }
 
     this.trigger.apply(this, arguments);

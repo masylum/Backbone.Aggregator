@@ -132,3 +132,19 @@ assert.ok(happened.threads_attr);
 assert.ok(happened.tasks_attr);
 assert.equal(threads.get('Task', 1).get('name'), 'fleiba');
 assert.equal(tasks.get(1).get('name'), 'fleiba');
+
+// event children reset!
+happened = {threads: false, tasks: false};
+threads.bind('reset', function () {
+  happened.threads = true
+});
+tasks.bind('reset', function () {
+  happened.tasks = true
+});
+tasks.reset([{id: 2}, {id: 3}]);
+assert.ok(happened.threads);
+assert.ok(happened.tasks);
+assert.deepEqual(threads.pluck('id'), [3, 2, 1]);
+assert.deepEqual(tasks.pluck('id'), [2, 3]);
+assert.deepEqual(_.pluck(threads.models, 'cid'), ['c6', 'c5', 'c3']);
+assert.deepEqual(_.pluck(tasks.models, 'cid'), ['c5', 'c6']);
