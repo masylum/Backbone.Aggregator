@@ -1,0 +1,9 @@
+{
+  "name": "Backbone.Aggregator",
+  "description": "Provides a collection-like constructor that allows you create aggregators from different collections",
+  "version": "0.0.1",
+  "author": "Pau ramon <masylum@gmail.com>",
+  "repository": {"type": "git", "url": "git://github.com/masylum/backbone.aggregator.git"},
+  "devDependencies": {"backbone": "*", "underscore": "*"},
+  "main": "./backbone.aggregator"
+}
