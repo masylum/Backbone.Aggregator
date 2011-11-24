@@ -213,7 +213,9 @@
       this._resetFromAggregator(model, collection);
     }
 
-    this.trigger.apply(this, arguments);
+    if (['add', 'remove', 'reset'].indexOf(ev) >= 0) {
+      this.trigger.apply(this, arguments);
+    }
   };
 
   /**

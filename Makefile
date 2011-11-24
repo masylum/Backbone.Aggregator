@@ -1,6 +1,6 @@
 NODE = node
 
 test:
-	@$(NODE) tests/test.js
+	./node_modules/.bin/mocha --reporter spec
 
 .PHONY: test
