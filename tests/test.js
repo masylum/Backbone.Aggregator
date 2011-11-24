@@ -7,6 +7,12 @@ var _ = require('underscore')
   // instances
   , tasks, activities, threads;
 
+function inc(what) {
+  return function () {
+    happened[what]++;
+  }
+}
+
 GLOBAL.Backbone = require('backbone');
 require('../backbone.aggregator');
 
@@ -134,17 +140,40 @@ assert.equal(threads.get('Task', 1).get('name'), 'fleiba');
 assert.equal(tasks.get(1).get('name'), 'fleiba');
 
 // event children reset!
-happened = {threads: false, tasks: false};
-threads.bind('reset', function () {
-  happened.threads = true
-});
-tasks.bind('reset', function () {
-  happened.tasks = true
-});
+happened = {threads: 0, tasks: 0};
+threads.bind('reset', inc('threads'));
+tasks.bind('reset', inc('tasks'));
+
 tasks.reset([{id: 2}, {id: 3}]);
-assert.ok(happened.threads);
-assert.ok(happened.tasks);
+
+assert.equal(happened.threads, 1);
+assert.equal(happened.tasks, 1);
+
 assert.deepEqual(threads.pluck('id'), [3, 2, 1]);
 assert.deepEqual(tasks.pluck('id'), [2, 3]);
 assert.deepEqual(_.pluck(threads.models, 'cid'), ['c6', 'c5', 'c3']);
 assert.deepEqual(_.pluck(tasks.models, 'cid'), ['c5', 'c6']);
+
+// event agregator reset
+happened = {threads: 0, tasks: 0, threads_add: 0, tasks_add: 0};
+threads.unbind('add');
+tasks.unbind('add');
+threads.unbind('reset');
+tasks.unbind('reset');
+threads.bind('add', inc('threads_add'));
+tasks.bind('add', inc('tasks_add'));
+threads.bind('reset', inc('threads'));
+tasks.bind('reset', inc('tasks'));
+
+threads.reset([{id: 4, type: 'Task'}, {id: 5, type: 'Task'}]);
+
+assert.equal(happened.threads, 2);
+assert.equal(happened.tasks, 1);
+assert.equal(happened.threads_add, 0);
+assert.equal(happened.tasks_add, 0);
+
+assert.deepEqual(threads.pluck('id'), [5, 4]);
+assert.deepEqual(tasks.pluck('id'), [4, 5]);
+assert.deepEqual(_.pluck(threads.models, 'cid'), ['c10', 'c9']);
+assert.deepEqual(_.pluck(tasks.models, 'cid'), ['c9', 'c10']);
+assert.equal(activities.length, 0);

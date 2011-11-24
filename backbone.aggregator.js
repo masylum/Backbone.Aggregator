@@ -14,6 +14,31 @@
   }
 
   /**
+   * Aggregator constructor
+   *
+   * @param {String|Object} type
+   * @param {Number} id
+   * @return {Object}
+   */
+  Backbone.Aggregator = function Aggregator(models, options) {
+    options = options || {};
+    if (options.comparator) {
+      this.comparator = options.comparator;
+    }
+    _.bindAll(this, '_onModelEvent', '_removeReference', '_proxyEvents');
+
+    _.each(this.collections(), function (collection, index) {
+      collection.bind('all', this._proxyEvents);
+    }, this);
+
+    this._reset();
+    if (models) {
+      this.reset(models, {silent: true});
+    }
+    this.initialize.apply(this, arguments);
+  };
+
+  /**
    * Get an object given an id, type or a object containing both
    *
    * @param {String|Object} type
@@ -33,15 +58,24 @@
   };
 
   /**
-   * Resets the collection and proxies the aggregator collection events
+   * Resets the aggregated collections
    *
+   * @param {Object} models
    * @param {Object} options
+   * @return {Object} collection
    */
-  Aggregator._reset = function (options) {
-    Backbone.Collection.prototype._reset.call(this);
-    _.each(this.collections(), function (collection) {
-      collection.bind('all', _.bind(this._proxyEvents, this));
+  Aggregator.reset = function (models, options) {
+    models = models || [];
+    options = options || {};
+    this.each(this._removeReference);
+    this._reset();
+    this.add(models, {silent: true});
+    _.each(this.collections(), function (collection, index) {
+      collection.reset(_.filter(models, function (model) {
+        return model.type === index;
+      }), _.clone(options));
     }, this);
+    return this;
   };
 
   /**
@@ -75,9 +109,6 @@
     model.bind('all', this._onModelEvent);
     this.length++;
     options.index = index;
-    if (!options.silent) {
-      model.trigger('add', model, this, options);
-    }
     return model;
   };
 
@@ -107,10 +138,7 @@
     this.models.splice(index, 1);
     this.length--;
     options.index = index;
-    if (!options.silent) {
-      model.trigger('remove', model, this, options);
-    }
-    model.unbind('all', this._onModelEvent);
+    this._removeReference(model);
     return model;
   };
 
@@ -139,7 +167,9 @@
     }, this);
 
     collection.each(function (model) {
-      this._addToAggregator(model, options);
+      if (model.get('type') === type) {
+        this._addToAggregator(model, options);
+      }
     }, this);
   };
 
@@ -186,5 +216,15 @@
     this.trigger.apply(this, arguments);
   };
 
-  Backbone.Aggregator = Backbone.Collection.extend(Aggregator);
+  /**
+   * Unbinds the _onModelEvent listener
+   *
+   * @param {Object} model
+   */
+  Aggregator._removeReference = function (model) {
+    model.unbind('all', this._onModelEvent);
+  };
+
+  _.extend(Backbone.Aggregator.prototype, Backbone.Collection.prototype, Aggregator);
+  Backbone.Aggregator.extend = Backbone.Collection.extend;
 }).call(this);
