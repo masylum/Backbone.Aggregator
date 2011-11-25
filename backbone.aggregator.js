@@ -48,7 +48,7 @@
   Aggregator.get = function (type, id) {
     if (typeof type === 'object') {
       id = type.id;
-      type = type.type || type.get('type');
+      type = typeof type.type === 'string' ? type.type : type.get('type');
     }
 
     if (id === null || !type) {
