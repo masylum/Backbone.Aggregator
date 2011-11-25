@@ -25,6 +25,11 @@
     if (options.comparator) {
       this.comparator = options.comparator;
     }
+
+    if (options.collections) {
+      this.collections = options.collections;
+    }
+
     _.bindAll(this, '_onModelEvent', '_removeReference', '_proxyEvents');
 
     _.each(this.collections(), function (collection, index) {

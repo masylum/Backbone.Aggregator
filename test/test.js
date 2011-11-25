@@ -10,7 +10,7 @@ var _ = require('underscore')
 function inc(what) {
   return function () {
     happened[what]++;
-  }
+  };
 }
 
 GLOBAL.Backbone = require('backbone');
@@ -197,4 +197,33 @@ describe('Aggregated collections', function () {
     assert.deepEqual(_.pluck(tasks.models, 'cid'), ['c9', 'c10']);
     assert.equal(activities.length, 0);
   });
+
+  it("allows customizing the collections function via options.collections", function () {
+    var my_tasks = new Collections.Tasks()
+    ,   my_activities = new Collections.Activities()
+    ,   my_threads = new Collections.Threads(false, {collections: function () { 
+      return {
+        Task: my_tasks
+      , Activity: my_activities
+      };
+    }});
+
+    happened = {threads: 0, tasks: 0, activities: 0};
+
+    my_threads.bind('add', inc('threads'));
+    my_tasks.bind('add', inc('tasks'));
+    my_activities.bind('add', inc('activities'));
+
+    my_tasks.add({id: 0});
+    my_activities.add({id: 0});
+
+    assert.equal(happened.threads, 2);
+    assert.equal(happened.tasks, 1);
+    assert.equal(happened.activities, 1);
+
+    assert.deepEqual(my_threads.pluck('id'), [0,0]);
+    assert.deepEqual(my_tasks.pluck('id'), [0]);
+    assert.deepEqual(my_activities.pluck('id'), [0]);
+  });
+
 });
