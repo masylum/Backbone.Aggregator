@@ -20,17 +20,7 @@
    * @param {Number} id
    * @return {Object}
    */
-  Backbone.Aggregator = function Aggregator() {
-    this.initialize.apply(this, arguments);
-  };
-
-  /**
-   * Initialize the aggregator
-   *
-   * @param {String|Object} model
-   * @param {Object} options
-   */
-  Aggregator.initialize = function (models, options) {
+  Backbone.Aggregator = function Aggregator(models, options) {
     options = options || {};
     if (options.comparator) {
       this.comparator = options.comparator;
@@ -45,8 +35,8 @@
     if (models) {
       this.reset(models, {silent: true});
     }
+    this.initialize.apply(this, arguments);
   };
-
 
   /**
    * Get an object given an id, type or a object containing both
