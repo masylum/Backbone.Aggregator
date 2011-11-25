@@ -60,16 +60,8 @@ Collections.Threads = Backbone.Aggregator.extend({
     return this;
   }
 , _proxyEvents: function (ev, model, collection, options) {
-    if (ev === 'add' && collection !== this) {
-      this._addToAggregator(model, options);
-    }
-
-    if (ev === 'remove' && collection !== this) {
-      this._removeFromAggregator(model, options);
-    }
-
-    if (['add', 'remove'].indexOf(ev) >= 0) {
-      this.trigger.apply(this, arguments);
+    if (ev !== 'reset') {
+      Backbone.Aggregator.prototype._proxyEvents.apply(this, arguments);
     }
   }
 });
