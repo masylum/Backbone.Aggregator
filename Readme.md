@@ -1,3 +1,4 @@
+[![build status](https://secure.travis-ci.org/masylum/Backbone.Aggregator.png)](http://travis-ci.org/masylum/Backbone.Aggregator)
 # Backbone.aggregator
 
 A collection that contains pointers to elements to other collections models.
